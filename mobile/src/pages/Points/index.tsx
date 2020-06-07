@@ -2,11 +2,15 @@ import React, { useState, useEffect } from 'react';
 import Constants from 'expo-constants';
 import { Feather } from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Alert, ScrollView } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity, Alert, ScrollView } from 'react-native';
+
+import { Text, Switch, useTheme } from 'react-native-paper';
+
 import MapView, { Marker } from 'react-native-maps';
 import { SvgUri } from 'react-native-svg';
 import * as Location from 'expo-location';
 import api from '../../services/api';
+
 
 interface Item {
   id: number;
@@ -34,8 +38,13 @@ const Points = () => {
   const [selectedItem, setSelectedItem] = useState<number[]>([])
   const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0])
 
+  
+
   const navigation = useNavigation()
   const route = useRoute()
+
+  const { colors, dark } = useTheme()
+
 
   const routeParams = route.params as Params
 
@@ -79,6 +88,7 @@ const Points = () => {
     })
   }, [selectedItem])
 
+
   function handleNavigateBack() {
     navigation.goBack();
   }
@@ -100,14 +110,32 @@ const Points = () => {
     }
 
   }
+
+  
+  
+ 
   return (
     <>
       <View style={styles.container}>
         <TouchableOpacity onPress={handleNavigateBack}>
           <Feather name="arrow-left" size={20} color="#34cb79" />
-        </TouchableOpacity>
 
-        <Text style={styles.title}>Bem vindo.</Text>
+        </TouchableOpacity>
+        <View>
+              <Switch
+                style={{marginTop:-20}}
+                trackColor={{ false: "#222831", true: "#ececec" }}
+                thumbColor={dark ? "#ececec" : "#222831" }
+                onValueChange={colors.toggleSwitch}
+                // thumbColor={isEnabledDarkTheme ? "white" : "black"}  
+                value={dark}
+              />
+          </View>
+
+        <Text style={[
+          styles.title,
+          //{color: colors.titleColor}
+          ]}>Bem vindo.</Text>
         <Text style={styles.description}>Encontre no mapa um ponto de coleta.</Text>
 
         <View style={styles.mapContainer}>
@@ -125,14 +153,14 @@ const Points = () => {
               {points.map(point => (
                 <Marker
                   key={String(point.id)}
-                  onPress={() => handleNavigateToDerail(point.id)}
+                  onPress={() => handleNavigateToDerail(1)}
                   style={styles.mapMarker}
                   coordinate={{
-                    latitude: point.latitude,
-                    longitude: point.longitude,
+                    latitude: initialPosition[0],
+                    longitude: initialPosition[1],
                   }}
                 >
-                  <View style={styles.mapMarkerContainer}>
+                  <View style={[styles.mapMarkerContainer, {backgroundColor: colors.border } ]}>
                     <Image style={styles.mapMarkerImage} source={{ uri: point.img_url }} />
                     <Text style={styles.mapMarkerTitle}>{point.name}</Text>
                   </View>
@@ -155,7 +183,8 @@ const Points = () => {
               key={String(item.id)}
               style={[
                 styles.item,
-                selectedItem.includes(item.id) ? styles.selectedItem : {}
+                selectedItem.includes(item.id) ? styles.selectedItem : {},
+                {backgroundColor: colors.card}
               ]}
               activeOpacity={0.6}
               onPress={() => handleSelectedItem(item.id)}>
@@ -214,7 +243,6 @@ const styles = StyleSheet.create({
   mapMarkerContainer: {
     width: 90,
     height: 70,
-    backgroundColor: '#34CB79',
     flexDirection: 'column',
     borderRadius: 8,
     overflow: 'hidden',

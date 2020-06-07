@@ -2,6 +2,9 @@ import React, { useEffect, useState } from 'react';
 
 import { Feather as Icon, FontAwesome} from '@expo/vector-icons';
 import { useNavigation, useRoute } from '@react-navigation/native';
+
+import { useTheme } from 'react-native-paper';
+
 import { View, StyleSheet, Image, Text, TouchableOpacity, SafeAreaView, Linking } from 'react-native';
 import { RectButton } from 'react-native-gesture-handler';
 
@@ -16,7 +19,7 @@ interface Params {
 interface Data {
     point: {
         image: string;
-	img_url: string;
+	      img_url: string;
         name: string;
         email: string;
         whatsapp: string;
@@ -35,6 +38,8 @@ const Detail = () => {
     const route = useRoute()
 
     const routeParams = route.params as Params ;
+
+    const { colors } = useTheme();
 
     useEffect(() => {
         api.get(`points/${routeParams.point_id}`).then(response => {
@@ -70,13 +75,17 @@ const Detail = () => {
 
             <Image style={styles.pointImage} source={{ uri: data.point.img_url }} />
             
-            <Text style={styles.pointName} >{data.point.name}</Text>
+            <Text style={[
+                          styles.pointName,
+                          {color: colors.text }
+                        ]}
+                           >{data.point.name}</Text>
             <Text style={styles.pointItems} >
                 {data.items.map(item => item.title).join(', ')}
             </Text>
 
             <View style={styles.address}>
-                <Text style={styles.addressTitle}>Endereço</Text>
+                <Text style={[styles.addressTitle, {color: colors.text} ]}>Endereço</Text>
                 <Text style={styles.addressContent}>{data.point.city}, {data.point.uf}</Text>
             </View>
         </View>
@@ -112,7 +121,6 @@ const styles = StyleSheet.create({
     },
   
     pointName: {
-      color: '#322153',
       fontSize: 28,
       fontFamily: 'Ubuntu_700Bold',
       marginTop: 24,
@@ -131,7 +139,6 @@ const styles = StyleSheet.create({
     },
     
     addressTitle: {
-      color: '#322153',
       fontFamily: 'Roboto_500Medium',
       fontSize: 16,
     },
